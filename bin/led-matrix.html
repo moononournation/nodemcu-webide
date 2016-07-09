@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LED Matrix</title>
+<style>
+#colorPicker {
+   padding: 4px;
+   background: #000;
+}
+#ledMatrix {
+   width: 320px;
+   height: 192px;
+   padding: 16px;
+   -webkit-border-radius:8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   background: #C0C0C0;
+}
+.Table {
+   display: table;
+   margin: 2px;
+}
+.Row {
+   display: table-row;
+}
+.Cell {
+   display: table-cell;
+}
+.Color {
+   width: 20px;
+   height: 20px;
+   margin: 2px;
+}
+.Circle {
+   width: 16px;
+   height: 16px;
+   margin: 8px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   background: #333;
+}
+</style>
+</head>
+<body>
+<h1>LED Matrix</h1>
+<div class="Table">
+<div class="Row">
+<div class="Cell">
+Color: <input type="text" id="colorText" size="10" value="#FFF" disabled>
+<div id="colorPicker" class="Table"></div>
+</div>
+<div class="Cell">
+<button id="btnSend">Send dots color to ESP-MINTIA</button>
+<div id="ledMatrix" class="Table"></div>
+</div>
+</div>
+</div>
+<div id="dataOutput"></div>
+<div id="txtResponse"></div>
+<script>
+var w = 10;
+var h = 6;
+var colorMin = 3;
+var colorMax = 15;
+var xhr;
+
+function getRGB(e) {
+   return window.getComputedStyle(e).backgroundColor.match(/\d+/g).map(function(a){ return Math.round(parseInt(a, 10) / 16.5); });
+}
+
+function getColor(e) {
+   var ct = document.getElementById("colorText");
+   var rgb = getRGB(e);
+   ct.value = "#" + rgb[0].toString(16) + rgb[1].toString(16) + rgb[2].toString(16);
+   ct.style.backgroundColor = ct.value;
+}
+
+function setColor(e) {
+   var ct = document.getElementById("colorText");
+   e.style.backgroundColor = ct.value;
+   sendData(e);
+}
+
+function sendData() {
+   var o = document.getElementById("dataOutput");
+   var text = "";
+   for (var i = 0; i < (h * w); i++) {
+      var d = document.getElementById("dot_" + i);
+      var rgb = getRGB(d);
+      text += String.fromCharCode(rgb[1] - colorMin);
+      text += String.fromCharCode(rgb[0] - colorMin);
+      text += String.fromCharCode(rgb[2] - colorMin);
+   }
+   text = "data=" + escape(text)
+   o.innerHTML = text;
+   if (!xhr) xhr = new XMLHttpRequest();
+   xhr.open("POST", "led-matrix.lc", true);
+   xhr.onreadystatechange=function() {
+      if (xhr.readyState === 4) {
+         var r = document.getElementById("txtResponse");
+         r.innerHTML = xhr.responseText;
+      }
+   }
+   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   xhr.send(text);
+}
+
+var cp = document.getElementById("colorPicker");
+var colorHtml = "";
+var i = 0;
+for (var r = colorMin; r <= colorMax; r+=6) {
+   for (var g = colorMin; g <= colorMax; g+=6) {
+      if ((g % 6) == 3) colorHtml += '<div calss="Row">';
+      for (var b = colorMin; b <= colorMax; b+=2) {
+         i++;
+         colorHtml += '<div class="Cell"><div class="Color" id="color' + i + '" style="background:#' + r.toString(16) + g.toString(16) + b.toString(16) + ';"></div></div>';
+      }
+      if ((g % 6) == 3) colorHtml += '</div>';
+   }
+}
+cp.innerHTML = colorHtml;
+for (var j = 1; j <= i; j++) {
+   var c = document.getElementById("color" + j);
+   c.addEventListener("click", function(e) {
+      getColor(e.srcElement);
+   });
+}
+
+var lm = document.getElementById("ledMatrix");
+var dotHtml = "";
+for (var i = 0; i < (h * w); i++) {
+   if ((i % w) == 0) dotHtml += '<div calss="Row">';
+   dotHtml += '<div class="Cell"><div class="Circle" id="dot_' + i + '"></div></div>';
+   if ((i % w) == (w - 1)) dotHtml += '</div>';
+}
+lm.innerHTML = dotHtml;
+for (var i = 0; i < (h * w); i++) {
+   var d = document.getElementById("dot_" + i);
+   d.addEventListener("click", function(e) {
+      setColor(e.srcElement);
+   });
+}
+
+document.getElementById("btnSend").addEventListener("click", sendData);
+</script>
+</body>
+</html>

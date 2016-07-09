@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+  <title>NodeMCU WebIDE</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+
+<body ng-app="webIDEApp">
+  <div id="toolbar">
+    <div class="header">NodeMCU WebIDE</div>
+    <button id="undo"><span class="icon icon-undo"></span></button>
+    <button id="save"><span class="icon icon-save"></span></button>
+    <button id="preview"><span class="icon icon-preview"></span></button>
+    <div id="localStatus"></div>
+    <div id="remoteStatus"></div>
+  </div>
+  <div id="filelist"></div>
+  <div id="editor"></div>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+
+</html>
