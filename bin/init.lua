@@ -17,7 +17,7 @@ wifiConfig.accessPointConfig.pwd = "ESP-"..node.chipid()    -- WiFi password - a
 wifiConfig.accessPointIpConfig = {}
 wifiConfig.accessPointIpConfig.ip = "192.168.111.1"
 wifiConfig.accessPointIpConfig.netmask = "255.255.255.0"
-wifiConfig.accessPointIpConfig.gateway = "192.168.111.1" -- avoid mobile cannot access internet issue
+wifiConfig.accessPointIpConfig.gateway = "0.0.0.0" -- avoid mobile cannot access internet issue
 
 wifiConfig.stationPointConfig = {}
 wifiConfig.stationPointConfig.ssid = "YourSSID" -- Name of the WiFi network you want to join
