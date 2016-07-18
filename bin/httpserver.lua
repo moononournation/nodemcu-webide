@@ -102,7 +102,7 @@ return function (port)
 
             -- parse payload and decide what to serve.
             local req = dofile("httpserver-request.lc")(payload)
-            --print(req.method .. ": " .. req.request)
+            print(req.method .. ": " .. req.request)
             if conf.auth.enabled then
                auth = dofile("httpserver-basicauth.lc")
                user = auth.authenticate(payload) -- authenticate returns nil on failed auth

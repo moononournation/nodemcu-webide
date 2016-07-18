@@ -6,6 +6,7 @@ return function (connection, req, args)
    --print("Begin sending:", args.file)
    --print("node.heap(): ", node.heap())
    if args.isGzipped and req.isCheckModifiedRequest() then
+      -- todo: really check if file updated
       dofile("httpserver-header.lc")(connection, 304, args.ext, args.isGzipped)
    else
       dofile("httpserver-header.lc")(connection, 200, args.ext, args.isGzipped)

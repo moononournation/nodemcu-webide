@@ -74,6 +74,23 @@ for i, f in ipairs(serverFiles) do compileAndRemoveIfNeeded(f) end
 
 compileAndRemoveIfNeeded = nil
 serverFiles = nil
+i = nil
+f = nil
+collectgarbage()
+
+-- pre compile other lua files
+local l, f, s
+l = file.list();
+for f, s in pairs(l) do
+  if ((string.sub(f, -4) == '.lua') and (f ~= 'config.lua') and (f ~= 'init.lua')) then
+    print('Compiling:', f)
+    node.compile(f)
+    collectgarbage()
+  end
+end
+l = nil
+f = nil
+s = nil
 collectgarbage()
 
 -- Connect to the WiFi access point.
@@ -104,4 +121,5 @@ end
 -- Uncomment to automatically start the server in port 80
 if (not not wifi.sta.getip()) or (not not wifi.ap.getip()) then
     dofile("httpserver.lc")(80)
+    collectgarbage()
 end

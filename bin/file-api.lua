@@ -34,23 +34,46 @@ return function (connection, req, args)
          end
          file.close()
       elseif rd['action'] == 'save' then
-         print('save file: '..rd['filename'])
+         --print('save file: '..rd['filename'])
          local data = rd['data']
          file.open(rd['filename'], 'w+')
          file.write(data)
          file.close()
          connection:send('initial write: ' .. string.len(data))
       elseif rd['action'] == 'append' then
-         print('append file: '..rd['filename'])
+         --print('append file: '..rd['filename'])
          local data = rd['data']
          file.open(rd['filename'], 'a+')
          file.seek('end')
          file.write(data)
          file.close()
-         connection:send('append: ' .. string.len(data))
+         connection:send('Append: '..string.len(data))
       elseif rd['action'] == 'compile' then
-         print('compile file: '..rd['filename'])
+         --print('compile file: '..rd['filename'])
          node.compile(rd['filename'])
+         local compiledfile = string.sub(rd['filename'], 1, -5)..'.lc'
+         connection:send('Compiled file: <a href="'..compiledfile..'" target="_blank">'..compiledfile..'</a>')
+      elseif rd['action'] == 'new' then
+         --print('create new file')
+         local i = 1
+         local f = 'new'..i..'.txt'
+         -- find a new file name
+         while file.open(f, 'r') do
+            file.close()
+            i = i + 1
+            f = 'new'..i..'.txt'
+         end
+         file.open(f, 'w+')
+         file.close()
+         connection:send('Created file: '..f)
+      elseif rd['action'] == 'rename' then
+         --print('rename file from "'..rd['filename']..'" to "'..rd['newfilename']..'"')
+         file.rename(rd['filename'], rd['newfilename'])
+         connection:send('Renamed file from "'..rd['filename']..'" to "'..rd['newfilename']..'"')
+      elseif rd['action'] == 'delete' then
+         --print('deleted file: '..rd['filename'])
+         file.remove(rd['filename'])
+         connection:send('Deleted file: '..rd['filename'])
       end
    end
    collectgarbage()
