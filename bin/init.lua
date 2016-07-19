@@ -1,3 +1,4 @@
+-- init and clear ws2812
 ws2812.init()
 ws2812.write(string.char(0):rep(3096))
 
@@ -12,7 +13,7 @@ wifiConfig.mode = wifi.STATIONAP  -- both station and access point
 
 wifiConfig.accessPointConfig = {}
 wifiConfig.accessPointConfig.ssid = "ESP-"..node.chipid()   -- Name of the SSID you want to create
-wifiConfig.accessPointConfig.pwd = "ESP-"..node.chipid()    -- WiFi password - at least 8 characters
+wifiConfig.accessPointConfig.pwd = "Pass"..node.chipid()    -- WiFi password - at least 8 characters
 
 wifiConfig.accessPointIpConfig = {}
 wifiConfig.accessPointIpConfig.ip = "192.168.111.1"
