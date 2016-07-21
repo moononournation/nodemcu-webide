@@ -244,13 +244,14 @@ function delete_file() {
 
 function init() {
   editor = CodeMirror(document.getElementById("editor"), {
-    styleActiveLine: true, // activeline
     lineNumbers: true,
     lineWrapping: true,
-    autoCloseBrackets: true, // closebrackets
-    autoCloseTags: true, //closetag
-    gutters: ["CodeMirror-lint-markers"],
-    lint: true
+    styleActiveLine: true, // activeline
+    autoCloseBrackets: true,
+    autoCloseTags: true,
+    matchBrackets: true,
+    matchTags: true,
+    highlightSelectionMatches: true
   });
 
   loadFilelist();
@@ -264,11 +265,14 @@ function init() {
 }
 
 // load large size script in sequence to avoid NodeMCU overflow
-// CodeMirror Compression helper https://codemirror.net/doc/compress.html
-// codemirror.js, css.js, htmlmixed.js, javascript.js, lua.js, xml.js
-// active-line.js, css-hint.js, html-hint.js, javascript-hint.js, trailingspace.js, xml-hint.js
-loadScript("codemirror-compressed.js", function () {
-  //loadScript("further-script.js", function () {
-  init();
-  //})
+// http://codemirror.net/doc/compress.html
+loadScript("codemirror.js", function () {
+  // css.js, htmlmixed.js, javascript.js, lua.js, xml.js
+  loadScript("modes.js", function () {
+    // active-line.js, match-highlighter.js, matchbrackets.js,
+    // matchtags.js, closebrackets.js, closetag.js, trailingspace.js, xml-fold.js
+    loadScript("addons.js", function () {
+      init();
+    })
+  })
 })
