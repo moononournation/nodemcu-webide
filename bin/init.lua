@@ -1,3 +1,8 @@
+-- init adc
+if adc.force_init_mode(adc.INIT_VDD33) then
+  node.restart()
+end
+
 -- init and clear ws2812
 ws2812.init()
 ws2812.write(string.char(0):rep(3096))
@@ -9,7 +14,7 @@ local wifiConfig = {}
 -- wifi.STATION         -- station: join a WiFi network
 -- wifi.SOFTAP          -- access point: create a WiFi network
 -- wifi.STATIONAP       -- both station and access point
-wifiConfig.mode = wifi.STATIONAP  -- both station and access point
+wifiConfig.mode = wifi.SOFTAP  -- both station and access point
 
 wifiConfig.accessPointConfig = {}
 wifiConfig.accessPointConfig.ssid = "ESP-"..node.chipid()   -- Name of the SSID you want to create
