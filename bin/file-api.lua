@@ -52,16 +52,16 @@ return function (connection, req, args)
          --print('compile file: '..rd['filename'])
          node.compile(rd['filename'])
          local compiledfile = string.sub(rd['filename'], 1, -5)..'.lc'
-         connection:send('Compiled file: <a href="'..compiledfile..'" target="_blank">'..compiledfile..'</a>')
+         connection:send('Compiled file: <a href="'..compiledfile..'?" target="_blank">'..compiledfile..'</a>')
       elseif rd['action'] == 'new' then
          --print('create new file')
          local i = 1
-         local f = 'new'..i..'.txt'
+         local f = 'new'..i..'.lua'
          -- find a new file name
          while file.open(f, 'r') do
             file.close()
             i = i + 1
-            f = 'new'..i..'.txt'
+            f = 'new'..i..'.lua'
          end
          file.open(f, 'w+')
          file.close()

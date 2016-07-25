@@ -75,6 +75,7 @@ function loadFilelist() {
         filelistHtml += '<div class="fileItem" id="' + files[i] + '"><span class="icon icon-file"></span> ' + files[i] + '</div>'
       }
       document.getElementById("filelist").innerHTML = filelistHtml;
+      curFileItem = null;
 
       fileItemList = document.getElementsByClassName("fileItem");
       for (i = 0; i < fileItemList.length; i++) {
@@ -148,6 +149,7 @@ function loadFile() {
     if (isXhrSuccess(xhr)) {
       setRemoteStatus("");
       editor.setValue(xhr.responseText);
+      editor.markClean();
       var extension = filename.split(".").pop();
       switch (extension) {
         case "css":
@@ -201,7 +203,7 @@ function preview() {
   if (curFileItem) {
     var url = curFileItem.id;
     setLocalStatus("Preview: "+url);
-    var win = window.open(url, '_blank');
+    var win = window.open(url+'?', '_blank');
     win.focus();
   }
 }
@@ -247,11 +249,11 @@ function init() {
     lineNumbers: true,
     lineWrapping: true,
     styleActiveLine: true, // activeline
-    autoCloseBrackets: true,
-    autoCloseTags: true,
     matchBrackets: true,
     matchTags: true,
-    highlightSelectionMatches: true
+    autoCloseBrackets: true,
+    autoCloseTags: true,
+    showTrailingSpace: true
   });
 
   loadFilelist();
@@ -269,8 +271,8 @@ function init() {
 loadScript("codemirror.js", function () {
   // css.js, htmlmixed.js, javascript.js, lua.js, xml.js
   loadScript("modes.js", function () {
-    // active-line.js, match-highlighter.js, matchbrackets.js,
-    // matchtags.js, closebrackets.js, closetag.js, trailingspace.js, xml-fold.js
+    // active-line.js, closebrackets.js, closetag.js,
+    // matchbrackets.js, matchtags.js,  trailingspace.js, xml-fold.js
     loadScript("addons.js", function () {
       init();
     })
