@@ -80,7 +80,6 @@ return function (port)
 
          local function onReceive(connection, payload)
             collectgarbage()
-            local conf = dofile("config.lua")
             local auth
             local user = "Anonymous"
 
