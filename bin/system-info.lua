@@ -41,7 +41,7 @@ return function (connection, req, args)
 
     connection:send('<p><b>AP client list:</b> ')
     local clients = wifi.ap.getclient()
-    for mac, ip in pairs(table) do
+    for mac, ip in pairs(clients) do
       connection:send('<p><b>'..mac..':</b> '..ip..'</p>')
     end
     connection:send('</p>')
