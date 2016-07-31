@@ -33,7 +33,7 @@ return function (connection, req, args)
     connection:send('<p><b>WiFi Mode:</b> NULLMODE</p>')
   end
 
-  if (wifimode == wifi.STATION) or (wifimode == wifi.SOFTAP) then
+  if (wifimode == wifi.STATIONAP) or (wifimode == wifi.SOFTAP) then
     local ip, netmask, gateway = wifi.ap.getip()
     connection:send('<p><b>AP IP:</b> '..ip..'</p>')
     connection:send('<p><b>AP netmask:</b> '..netmask..'</p>')
