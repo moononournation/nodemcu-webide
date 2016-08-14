@@ -22,7 +22,7 @@ if (conf.wifi.mode == wifi.SOFTAP) or (conf.wifi.mode == wifi.STATIONAP) then
 end
 if (conf.wifi.mode == wifi.STATION) or (conf.wifi.mode == wifi.STATIONAP) then
     print('Client MAC: ', wifi.sta.getmac())
-    wifi.sta.sethostname(conf.wifi.stahostname)
+    wifi.sta.sethostname(conf.hostname)
     wifi.sta.config(conf.wifi.stassid, conf.wifi.stapwd, 1)
 end
 
@@ -92,7 +92,7 @@ if (wifi.getmode() == wifi.STATION) or (wifi.getmode() == wifi.STATIONAP) then
              print('Failed to connect to WiFi Access Point.')
           else
              print('IP: ',ip)
-             mdns.register(conf.wifi.stahostname, { description="NodeMCU WebIDE", service="http", port=80, location='In your ESP board' })
+             mdns.register(conf.hostname, { description="NodeMCU WebIDE", service="http", port=80, location='In your ESP board' })
           end
           tmr.stop(0)
           joinCounter = nil

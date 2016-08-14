@@ -3,6 +3,8 @@
 
 conf = {}
 
+conf.hostname = "NODEMCU-WEBIDE" -- DNS host name send to DHCP server (don't use underscore)
+
 -- Basic Authentication Conf
 conf.auth = {}
 conf.auth.enabled = true
@@ -18,7 +20,6 @@ conf.wifi = {}
 conf.wifi.mode = wifi.SOFTAP -- default: SOFTAP (avoid try to connect an invalid AP)
 
 -- STATION config
---conf.wifi.stahostname = "NODEMCU-WEBIDE" -- DNS host name send to DHCP server (don't use underscore)
 --conf.wifi.stassid = "YourSSID" -- Name of the WiFi network you want to join
 --conf.wifi.stapwd = "PleaseInputYourPasswordHere" -- Password for the WiFi network
 
