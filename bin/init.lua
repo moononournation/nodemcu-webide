@@ -22,6 +22,7 @@ if (conf.wifi.mode == wifi.SOFTAP) or (conf.wifi.mode == wifi.STATIONAP) then
 end
 if (conf.wifi.mode == wifi.STATION) or (conf.wifi.mode == wifi.STATIONAP) then
     print('Client MAC: ', wifi.sta.getmac())
+    wifi.sta.sethostname(conf.wifi.stahostname)
     wifi.sta.config(conf.wifi.stassid, conf.wifi.stapwd, 1)
 end
 
@@ -62,12 +63,12 @@ i = nil
 f = nil
 collectgarbage()
 
--- pre compile other lua files
+-- pre-compile other lua files
 local l, f, s
 l = file.list();
 for f, s in pairs(l) do
   if ((string.sub(f, -4) == '.lua') and (f ~= 'config.lua') and (f ~= 'init.lua')) then
-    print('Compiling:', f)
+    print('Pre-compiling:', f)
     node.compile(f)
     collectgarbage()
   end
@@ -103,5 +104,6 @@ end
 -- start the nodemcu-httpserver in port 80
 if (not not wifi.sta.getip()) or (not not wifi.ap.getip()) then
     dofile("httpserver.lc")(80)
+    mdns.register("nodemcu-webide", { description="NodeMCU WebIDE", service="http", port=80, location='In your ESP board' })
     collectgarbage()
 end
