@@ -92,6 +92,7 @@ if (wifi.getmode() == wifi.STATION) or (wifi.getmode() == wifi.STATIONAP) then
              print('Failed to connect to WiFi Access Point.')
           else
              print('IP: ',ip)
+             mdns.register(conf.wifi.stahostname, { description="NodeMCU WebIDE", service="http", port=80, location='In your ESP board' })
           end
           tmr.stop(0)
           joinCounter = nil
@@ -104,6 +105,5 @@ end
 -- start the nodemcu-httpserver in port 80
 if (not not wifi.sta.getip()) or (not not wifi.ap.getip()) then
     dofile("httpserver.lc")(80)
-    mdns.register("nodemcu-webide", { description="NodeMCU WebIDE", service="http", port=80, location='In your ESP board' })
     collectgarbage()
 end
