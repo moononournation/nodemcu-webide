@@ -5,7 +5,7 @@
 return function (connection, code, extension, isGzipped)
 
    local function getHTTPStatusString(code)
-      local codez = {[200]="OK", [304]="Not Modified", [400]="Bad Request", [404]="Not Found",}
+      local codez = {[200]="OK", [304]="Not Modified", [400]="Bad Request", [404]="Not Found", [500]="Internal Server Error",}
       local myResult = codez[code]
       -- enforce returning valid http codes all the way throughout?
       if myResult then return myResult else return "Not Implemented" end
@@ -19,12 +19,13 @@ return function (connection, code, extension, isGzipped)
 
    local mimeType = getMimeType(extension)
 
-   connection:send("HTTP/1.0 " .. code .. " " .. getHTTPStatusString(code) .. "\r\nServer: nodemcu-httpserver\r\nContent-Type: " .. mimeType .. "\r\nnCache-Control: private, no-store\r\n")
+   connection:send("HTTP/1.0 " .. code .. " " .. getHTTPStatusString(code) .. "\r\nServer: nodemcu-httpserver\r\nContent-Type: " .. mimeType .. "\r\n")
    if isGzipped then
       connection:send("Cache-Control: max-age=2592000\r\nContent-Encoding: gzip\r\n")
+      --TODO: handle Last-Modified for each file instead of use a fixed dummy date time
+      connection:send("Last-Modified: Fri, 01 Jan 2016 00:00:00 GMT\r\n")
+   else
+      connection:send("Cache-Control: private, no-store\r\n")
    end
-   connection:send("Last-Modified: Fri, 01 Jan 2016 00:00:00 GMT\r\n")
    connection:send("Connection: close\r\n\r\n")
-
 end
-
