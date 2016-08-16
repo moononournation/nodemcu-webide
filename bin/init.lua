@@ -93,6 +93,7 @@ if (wifi.getmode() == wifi.STATION) or (wifi.getmode() == wifi.STATIONAP) then
           else
              print('IP: ',ip)
              mdns.register(conf.hostname, { description="NodeMCU WebIDE", service="http", port=80, location='In your ESP board' })
+             sntp.sync('pool.ntp.org')
           end
           tmr.stop(0)
           joinCounter = nil
