@@ -1,7 +1,7 @@
 return function (connection, req, args)
   dofile('httpserver-header.lc')(connection, 200, 'html')
 
-  connection:send('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>WiFi info</title></head><body>')
+  connection:send('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>System Info</title></head><body>')
 
   connection:send('<p><b>Chip ID:</b> '..node.chipid()..'</p>')
   connection:send('<p><b>Flash ID:</b> '..node.flashid()..'</p>')
@@ -13,6 +13,9 @@ return function (connection, req, args)
   local address, size = file.fscfg()
   connection:send('<p><b>File System Address:</b> '..address..'</p>')
   connection:send('<p><b>File System Size:</b> '..size..' bytes</p>')
+
+  local tm = rtctime.epoch2cal(rtctime.get())
+  connection:send('<p><b>RTC Time:</b> '..string.format("%04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"])..'</p>')
 
   local remaining, used, total = file.fsinfo()
   connection:send('<p><b>File System Usage:</b> '..used..' / '..total..' bytes</p>')
