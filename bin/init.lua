@@ -25,8 +25,6 @@ if (conf.wifi.mode == wifi.STATION) or (conf.wifi.mode == wifi.STATIONAP) then
     wifi.sta.sethostname(conf.hostname)
     wifi.sta.config(conf.wifi.stassid, conf.wifi.stapwd, 1)
 end
-
-conf.wifi = nil
 collectgarbage()
 
 -- show system info
@@ -87,10 +85,14 @@ if (wifi.getmode() == wifi.STATION) or (wifi.getmode() == wifi.STATIONAP) then
        local ip = wifi.sta.getip()
        if ip == nil and joinCounter < joinMaxAttempts then
           print('Connecting to WiFi Access Point ...')
-          joinCounter = joinCounter +1
+          joinCounter = joinCounter + 1
        else
           if joinCounter == joinMaxAttempts then
              print('Failed to connect to WiFi Access Point.')
+             print('Fall back to SOFTAP.')
+             wifi.setmode(wifi.SOFTAP)
+             wifi.ap.config(conf.wifi.ap)
+             wifi.ap.setip(conf.wifi.apip)
           else
              print('IP: ',ip)
              mdns.register(conf.hostname, { description="NodeMCU WebIDE", service="http", port=80, location='In your ESP board' })
