@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>WebSocket Echo</title>
+  </head>
+  <body>
+    <h1>WebSocket Echo</h1>
+    <p>Message: <input type="text" id="message"> <button onclick="sendMessage()">Send</button></p>
+
+    <div id="log"></div>
+
+    <script language="javascript" type="text/javascript">
+      var wsUri = "ws://" + location.hostname + "/ws-echo.lc";
+      var messageLog;
+
+      function init()
+      {
+        logDiv = document.getElementById("log");
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function(evt) { appendLog('<span style="color: green;">CONNECTED</span>') };
+        websocket.onclose = function(evt) { appendLog('<span style="color: green;">DISCONNECTED</span>') };
+        websocket.onmessage = function(evt) { appendLog('<span style="color: blue;">RESPONSE:</span> ' + evt.data) };
+        websocket.onerror = function(evt) { appendLog('<span style="color: red;">ERROR:</span> ' + evt.data) };
+      }
+
+      function sendMessage()
+      {
+        message = document.getElementById("message").value;
+        appendLog('<span style="color: green;">SENT:</span> ' + message);
+        websocket.send(message);
+      }
+
+      function appendLog(log)
+      {
+        var pre = document.createElement("p");
+        pre.innerHTML = log;
+        logDiv.appendChild(pre);
+      }
+
+      window.addEventListener("load", init, false);
+    </script>
+  </body>
+</html>

@@ -79,6 +79,12 @@ return function (port)
          end
 
          local function onReceive(connection, payload)
+            --websocket
+            if payload:find("Upgrade: websocket") then
+              dofile('httpserver-websocket.lc')(connection, payload)
+              return
+            end
+
             collectgarbage()
             local auth
             local user = "Anonymous"

@@ -53,6 +53,7 @@ local serverFiles = {
    'httpserver-header.lua',
    'httpserver-request.lua',
    'httpserver-static.lua',
+   'httpserver-websocket.lua',
    'file-api.lua'
 }
 for i, f in ipairs(serverFiles) do compileAndRemoveIfNeeded(f) end
