@@ -9,7 +9,7 @@ local function decode(chunk)
     if #chunk < 4 then return end
     len = bit.bor(
       bit.lshift(string.byte(chunk, 3), 8),
-      byte(chunk, 4))
+      string.byte(chunk, 4))
     offset = 4
   elseif len == 127 then
     if #chunk < 10 then return end
