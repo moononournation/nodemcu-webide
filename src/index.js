@@ -7,7 +7,7 @@ var curFileItem;
 var savingText;
 var savingFilename;
 var savingFileOffset;
-var xhr; // reuse
+var savingXhr;
 
 function setLocalStatus(msg) {
   document.getElementById("localStatus").innerHTML = msg;
@@ -57,7 +57,7 @@ function handleFileClick(item) {
 }
 
 function loadFilelist() {
-  xhr = new XMLHttpRequest();
+  var xhr = new XMLHttpRequest();
   xhr.open("POST", "file-api.lc", true);
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhr.onreadystatechange = function () {
@@ -80,7 +80,7 @@ function loadFilelist() {
       fileItemList = document.getElementsByClassName("fileItem");
       for (i = 0; i < fileItemList.length; i++) {
         fileItemList[i].addEventListener("click", function (e) {
-          handleFileClick(e.srcElement);
+          handleFileClick(e.target);
         });
       }
 
@@ -94,22 +94,22 @@ function loadFilelist() {
 }
 
 function handleSaveCallback() {
-  if (isXhrSuccess(xhr)) {
+  if (isXhrSuccess(savingXhr)) {
     setRemoteStatus("");
 
     savingFileOffset += blockSize;
     if (savingFileOffset < savingText.length) {
       var params = "action=append&filename=" + savingFilename + "&data=" + encodeURIComponent(savingText.substring(savingFileOffset, savingFileOffset + blockSize));
-      xhr = new XMLHttpRequest();
-      xhr.open("POST", "file-api.lc", true);
-      xhr.onreadystatechange = handleSaveCallback;
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      savingXhr = new XMLHttpRequest();
+      savingXhr.open("POST", "file-api.lc", true);
+      savingXhr.onreadystatechange = handleSaveCallback;
+      savingXhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       setLocalStatus("<span class=\"icon icon-loading\"></span> Saving file: " + savingFilename + " " + savingFileOffset + "/" + savingText.length + " bytes");
-      xhr.send(params);
+      savingXhr.send(params);
     } else {
       if ((savingFilename.split(".").pop() == "lua") && (savingFilename != "config.lua") && (savingFilename != "init.lua")) {
         params = "action=compile&filename=" + savingFilename;
-        xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
         xhr.open("POST", "file-api.lc", true);
         xhr.onreadystatechange = handleCompileCallback;
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -120,7 +120,7 @@ function handleSaveCallback() {
       }
     }
   } else {
-    setRemoteStatus(xhr.responseText);
+    setRemoteStatus(savingXhr.responseText);
   }
 }
 
@@ -143,7 +143,7 @@ function handleFileCallback() {
 function loadFile() {
   var filename = curFileItem.id;
   var params = "action=load&filename=" + filename;
-  xhr = new XMLHttpRequest();
+  var xhr = new XMLHttpRequest();
   xhr.open("POST", "file-api.lc", true);
   xhr.onreadystatechange = function () {
     if (isXhrSuccess(xhr)) {
@@ -191,12 +191,12 @@ function save() {
   savingFilename = curFileItem.id;
   savingFileOffset = 0;
   var params = "action=save&filename=" + savingFilename + "&data=" + encodeURIComponent(savingText.substring(savingFileOffset, savingFileOffset + blockSize));
-  xhr = new XMLHttpRequest();
-  xhr.open("POST", "file-api.lc", true);
-  xhr.onreadystatechange = handleSaveCallback;
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  savingXhr = new XMLHttpRequest();
+  savingXhr.open("POST", "file-api.lc", true);
+  savingXhr.onreadystatechange = handleSaveCallback;
+  savingXhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   setLocalStatus("<span class=\"icon icon-loading\"></span> Saving file: " + savingFilename + " " + savingFileOffset + "/" + savingText.length + " bytes");
-  xhr.send(params);
+  savingXhr.send(params);
 }
 
 function preview() {
@@ -209,7 +209,7 @@ function preview() {
 }
 
 function new_file() {
-  xhr = new XMLHttpRequest();
+  var xhr = new XMLHttpRequest();
   xhr.open("POST", "file-api.lc", true);
   xhr.onreadystatechange = handleFileCallback;
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -222,7 +222,7 @@ function rename_file() {
     var filename = curFileItem.id;
     var newfilename = prompt("Rename " + filename + " to:", filename);
     if (newfilename != null) {
-      xhr = new XMLHttpRequest();
+      var xhr = new XMLHttpRequest();
       xhr.open("POST", "file-api.lc", true);
       xhr.onreadystatechange = handleFileCallback;
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -235,7 +235,7 @@ function rename_file() {
 function delete_file() {
   if (curFileItem) {
     var filename = curFileItem.id;
-    xhr = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
     xhr.open("POST", "file-api.lc", true);
     xhr.onreadystatechange = handleFileCallback;
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
