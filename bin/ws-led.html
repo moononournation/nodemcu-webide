@@ -129,7 +129,7 @@ function initColorPicker() {
   for (var j = 1; j <= i; j++) {
     var c = document.getElementById("color" + j);
     c.addEventListener("click", function(e) {
-        getColor(e.srcElement);
+        getColor(e.target||e.srcElement);
     });
   }
 }
@@ -146,7 +146,7 @@ function initLedMatrix() {
   for (var i = 0; i < (h * w); i++) {
     var d = document.getElementById("dot_" + i);
     d.addEventListener("click", function(e) {
-        setColor(e.srcElement);
+        setColor(e.target||e.srcElement);
     });
   }
 }

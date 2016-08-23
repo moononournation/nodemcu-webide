@@ -80,7 +80,7 @@ function loadFilelist() {
       fileItemList = document.getElementsByClassName("fileItem");
       for (i = 0; i < fileItemList.length; i++) {
         fileItemList[i].addEventListener("click", function (e) {
-          handleFileClick(e.target);
+          handleFileClick(e.target||e.srcElement);
         });
       }
 
