@@ -68,12 +68,6 @@ local function acceptKey(key)
   return crypto.toBase64(crypto.hash("sha1", key .. guid))
 end
 
-local function callback(socket)
-  function socket.onmessage(payload, opcode)
-        socket.send(payload..'!', 1)
-  end
-end
-
 return function (connection, payload)
   local buffer = false
   local socket = {}
@@ -107,6 +101,18 @@ return function (connection, payload)
         buffer = extra
         socket.onmessage(payload, opcode)
       end
+    end
+  end)
+
+  connection:on("sent", function(_, _)
+    if socket.onsent ~= nil then
+      socket.onsent()
+    end
+  end)
+
+  connection:on("disconnection", function(_, _)
+    if socket.onclose ~= nil then
+      socket.onclose()
     end
   end)
 
