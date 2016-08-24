@@ -131,7 +131,7 @@ function handleCompileCallback() {
   setRemoteStatus(xhr.responseText);
 }
 
-function handleFileCallback() {
+function handleFileCallback(xhr) {
   setRemoteStatus(xhr.responseText);
   if (isXhrSuccess(xhr)) {
     loadFilelist();
@@ -211,7 +211,9 @@ function preview() {
 function new_file() {
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "file-api.lc", true);
-  xhr.onreadystatechange = handleFileCallback;
+  xhr.onreadystatechange = function() {
+    handleFileCallback(xhr);
+  };
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   setLocalStatus("<span class=\"icon icon-loading\"></span> Creating new file");
   xhr.send("action=new");
@@ -224,7 +226,9 @@ function rename_file() {
     if (newfilename != null) {
       var xhr = new XMLHttpRequest();
       xhr.open("POST", "file-api.lc", true);
-      xhr.onreadystatechange = handleFileCallback;
+      xhr.onreadystatechange = function() {
+        handleFileCallback(xhr);
+      };
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       setLocalStatus("<span class=\"icon icon-loading\"></span> Renaming file from \""+filename+"\" to \""+newfilename+"\"");
       xhr.send("action=rename&filename="+escape(filename)+"&newfilename="+escape(newfilename));
@@ -237,7 +241,9 @@ function delete_file() {
     var filename = curFileItem.id;
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "file-api.lc", true);
-    xhr.onreadystatechange = handleFileCallback;
+    xhr.onreadystatechange = function() {
+      handleFileCallback(xhr);
+    };
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     setLocalStatus("<span class=\"icon icon-loading\"></span> Deleting file: \""+filename+"\"");
     xhr.send("action=delete&filename="+escape(filename));
