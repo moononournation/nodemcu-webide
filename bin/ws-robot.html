@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>WebSocket Remote Robot</title>
+    <style>
+      canvas {
+        border: 1px solid #000000;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket Remote Robot</h1>
+    <p>Touch the canvas to control the robot.</p>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <script language="javascript" type="text/javascript">
+      var wsUri = "ws://" + location.hostname + "/ws-robot.lc";
+      var websocket;
+      var canvas, context;
+
+      function init() {
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function(evt) { };
+        websocket.onclose = function(evt) { };
+        websocket.onmessage = function(evt) { };
+        websocket.onerror = function(evt) { };
+
+        canvas = document.getElementById('canvas');
+        context = canvas.getContext("2d");
+
+        // Add mouse event listeners to canvas element
+        canvas.addEventListener("mousedown", press, false);
+        canvas.addEventListener("mousemove", drag, false);
+        canvas.addEventListener("mouseup", release);
+        canvas.addEventListener("mouseout", cancel, false);
+
+        // Add touch event listeners to canvas element
+        canvas.addEventListener("touchstart", press, false);
+        canvas.addEventListener("touchmove", drag, false);
+        canvas.addEventListener("touchend", release, false);
+        canvas.addEventListener("touchcancel", cancel, false);
+      }
+
+      function sendMessage(message) {
+        websocket.send(message);
+      }
+
+      function press(e) {
+        var mouseX = (e.changedTouches ? e.changedTouches[0].pageX : e.pageX) - this.offsetLeft;
+        var mouseY = (e.changedTouches ? e.changedTouches[0].pageY : e.pageY) - this.offsetTop;
+        if (mouseX < 150) {
+          sendMessage('L');
+        } else if (mouseX > 250) {
+          sendMessage('R');
+        } else {
+          sendMessage('F');
+        }
+      }
+
+      function drag(e) {
+		var mouseX = (e.changedTouches ? e.changedTouches[0].pageX : e.pageX) - this.offsetLeft;
+		var mouseY = (e.changedTouches ? e.changedTouches[0].pageY : e.pageY) - this.offsetTop;
+        if (mouseX < 150) {
+          sendMessage('L');
+        } else if (mouseX > 250) {
+          sendMessage('R');
+        } else {
+          sendMessage('F');
+        }
+      }
+
+      function release(e) {
+        sendMessage('S');
+      }
+
+      function cancel(e) {
+        sendMessage('S');
+      }
+
+      window.addEventListener("load", init, false);
+    </script>
+  </body>
+</html>
