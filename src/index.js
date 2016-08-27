@@ -111,7 +111,12 @@ function handleSaveCallback() {
         params = "action=compile&filename=" + savingFilename;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "file-api.lc", true);
-        xhr.onreadystatechange = handleCompileCallback;
+        xhr.onreadystatechange = function() {
+          if (isXhrSuccess(xhr)) {
+            setLocalStatus("");
+          }
+          setRemoteStatus(xhr.responseText);
+        };
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         setLocalStatus("<span class=\"icon icon-loading\"></span> Compiling file: " + savingFilename);
         xhr.send(params);
@@ -124,13 +129,6 @@ function handleSaveCallback() {
   }
 }
 
-function handleCompileCallback() {
-  if (isXhrSuccess(xhr)) {
-    setLocalStatus("");
-  }
-  setRemoteStatus(xhr.responseText);
-}
-
 function handleFileCallback(xhr) {
   setRemoteStatus(xhr.responseText);
   if (isXhrSuccess(xhr)) {
@@ -138,7 +136,6 @@ function handleFileCallback(xhr) {
     setLocalStatus("");
   }
 }
-
 
 function loadFile() {
   var filename = curFileItem.id;
