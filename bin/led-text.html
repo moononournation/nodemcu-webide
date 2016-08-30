@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>LED Text</title>
+  </head>
+  <body>
+    <h1>LED Text</h1>
+    <p>Text: <input type="text" id="myText" value="Hello World!"><button id='set'>Set</button></p>
+    <canvas id="myCanvas" width="72" height="12" style="border:1px solid #00f;">Your browser does not support the HTML5 canvas tag.</canvas>
+    <div id="dataOutput"></div>
+    <script>
+      var w = 72;
+      var h = 12;
+
+      function color_text(v) {
+        return String.fromCharCode(Math.round(v/64));
+      }
+
+      document.getElementById("set").addEventListener("click", function () {
+        var t = document.getElementById("myText");
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        ctx.beginPath();
+        ctx.rect(0, 0, w, h);
+        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.font = "bolder 12px sans-serif";
+        var gradient=ctx.createLinearGradient(0,0,c.width,0);
+        gradient.addColorStop("0","orange");
+        gradient.addColorStop("0.5","red");
+        gradient.addColorStop("1.0","purple");
+        // Fill with gradient
+        ctx.fillStyle=gradient;
+        ctx.fillText(t.value, 0, 9);
+
+        var d = ctx.getImageData(0,0,w,h);
+        var o = document.getElementById("dataOutput");
+        text = "";
+        for (var y=0;y<h;y+=2)
+        {
+          for (var x=0;x<w;x+=2)
+          {
+            //average 4 pixels colors
+            //text += escape_color((d.data[((x+y*w)*4)+1] + d.data[((x+1+y*w)*4)+1] + d.data[((x+(y+1)*w)*4)+1] + d.data[((x+1+(y+1)*w)*4)+1]) / 4); // green
+            //text += escape_color((d.data[((x+y*w)*4)+0] + d.data[((x+1+y*w)*4)+0] + d.data[((x+(y+1)*w)*4)+0] + d.data[((x+1+(y+1)*w)*4)+0]) / 4); // red
+            //text += escape_color((d.data[((x+y*w)*4)+2] + d.data[((x+1+y*w)*4)+2] + d.data[((x+(y+1)*w)*4)+2] + d.data[((x+1+(y+1)*w)*4)+2]) / 4); // blue
+            text += color_text(d.data[((x+y*w)*4)+1]); // Green
+            text += color_text(d.data[((x+y*w)*4)+0]); // Red
+            text += color_text(d.data[((x+y*w)*4)+2]); // Blue
+          }
+        }
+        text = "data=" + escape(text);
+        o.innerHTML = text;
+        xhr=new XMLHttpRequest();
+        xhr.open("POST", "led-text.lc", true);
+        xhr.onreadystatechange=function() {}
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.send(text);
+      });
+    </script>
+  </body>
+</html>
