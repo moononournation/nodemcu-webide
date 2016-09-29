@@ -111,3 +111,5 @@ if (not not wifi.sta.getip()) or (not not wifi.ap.getip()) then
     dofile("httpserver.lc")(80)
     collectgarbage()
 end
+
+--dofile('led-stick.lc')()

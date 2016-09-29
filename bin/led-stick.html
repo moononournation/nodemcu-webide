@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>LED Cheering Stick</title>
+  </head>
+  <body>
+    <h1>LED Cheering Stick</h1>
+    <p>Text: <input type="text" id="myText" value="Hello!"><button id='set'>Set</button></p>
+    <canvas id="myCanvas" width="140" height="28" style="border:1px solid #00f;">Your browser does not support the HTML5 canvas tag.</canvas>
+    <div id="localStatus"></div>
+    <div id="remoteStatus"></div>
+    <script>
+      var w = 140;
+      var h = 28;
+      var blockSize = 320;
+
+      var savingText;
+      var savingFileOffset;
+      var savingXhr;
+
+      function color_text(v) {
+        return String.fromCharCode(Math.round(v/64));
+      }
+
+      function setLocalStatus(msg) {
+        document.getElementById("localStatus").innerHTML = msg;
+      }
+
+      function setRemoteStatus(msg) {
+        document.getElementById("remoteStatus").innerHTML = msg;
+      }
+
+      function isXhrSuccess(xhr) {
+        return ((xhr.readyState === 4) && (xhr.status == 200));
+      }
+
+      function handleSaveCallback() {
+        if (isXhrSuccess(savingXhr)) {
+          setRemoteStatus("");
+
+          savingFileOffset += blockSize;
+          if (savingFileOffset < savingText.length) {
+            var params = "action=append&filename=led-stick.dat&data=" + encodeURIComponent(savingText.substring(savingFileOffset, savingFileOffset + blockSize));
+            savingXhr = new XMLHttpRequest();
+            savingXhr.open("POST", "file-api.lc", true);
+            savingXhr.onreadystatechange = handleSaveCallback;
+            savingXhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            setLocalStatus("Sending data: " + savingFileOffset + "/" + savingText.length + " bytes");
+            savingXhr.send(params);
+          } else {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "led-stick.lc", true);
+            xhr.onreadystatechange = function() {
+              if (isXhrSuccess(xhr)) {
+                setLocalStatus("Run led-stick.lc!");
+              }
+              setRemoteStatus(xhr.responseText);
+            };
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            setLocalStatus("Data sent!");
+            xhr.send();
+          }
+        } else {
+          setRemoteStatus(savingXhr.responseText);
+        }
+      }
+
+      function save() {
+        savingFileOffset = 0;
+        var params = "action=save&filename=led-stick.dat&data=" + encodeURIComponent(savingText.substring(savingFileOffset, savingFileOffset + blockSize));
+        savingXhr = new XMLHttpRequest();
+        savingXhr.open("POST", "file-api.lc", true);
+        savingXhr.onreadystatechange = handleSaveCallback;
+        savingXhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        setLocalStatus("Sending data: " + savingFileOffset + "/" + savingText.length + " bytes");
+        savingXhr.send(params);
+      }
+
+      document.getElementById("set").addEventListener("click", function () {
+        var t = document.getElementById("myText");
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+        var gradient = ctx.createLinearGradient(0, 0, c.width, 0);
+        gradient.addColorStop("0", "red");
+        gradient.addColorStop("0.5", "green");
+        gradient.addColorStop("1.0", "purple");
+
+        ctx.beginPath();
+        ctx.rect(0, 0, w, h);
+        // Fill with gradient
+        ctx.fillStyle = gradient;
+//        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.font = "bolder 24px sans-serif";
+//        ctx.fillStyle = gradient;
+        ctx.fillStyle = "white";
+        ctx.fillText(t.value, 0, 22);
+
+        var d = ctx.getImageData(0, 0, w, h);
+        savingText = "";
+        for (var x = 0; x < w; x++)
+        {
+          for (var y = (h - 1); y >= 0; y--)
+          {
+            savingText += color_text(d.data[((x + y * w) * 4) + 1]); // Green
+            savingText += color_text(d.data[((x + y * w) * 4) + 0]); // Red
+            savingText += color_text(d.data[((x + y * w) * 4) + 2]); // Blue
+          }
+        }
+        save();
+      });
+    </script>
+  </body>
+</html>
