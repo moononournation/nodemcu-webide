@@ -1,5 +1,7 @@
 # **NodeMCU WebIDE** #
 
+![Prototype](https://cdn.instructables.com/FEK/5NJY/IRLQGMKS/FEK5NJYIRLQGMKS.RECTANGLE1.jpg)
+
 You may find more details at my instructables:
 http://www.instructables.com/id/NodeMCU-WebIDE/
 
