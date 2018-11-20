@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=0.8">
+<title>LED Matrix</title>
+<style>
+body {
+  background-color: black;
+  color: white;
+}
+button {
+  font-size: 1em;
+}
+#colorPicker {
+   padding: 2px;
+}
+.ledMatrix {
+   width: 160px;
+   height: 160px;
+   padding: 16px;
+   -webkit-border-radius:8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   background: #444;
+}
+.Table {
+   display: table;
+   margin: 2px;
+}
+.Row {
+   display: table-row;
+}
+.Cell {
+   display: table-cell;
+   text-align: center;
+   vertical-align: middle;
+}
+.Color {
+   width: 30px;
+   height: 30px;
+   margin: 2px;
+}
+.Circle {
+   width: 16px;
+   height: 16px;
+   margin: 8px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   background: #333;
+}
+</style>
+</head>
+<body>
+<h1>LED Matrix</h1>
+<div class="Table">
+<div class="Row">
+<div class="Cell">
+<div id="colorPicker" class="Table"></div>
+</div>
+<div class="Cell">
+Selected color: <input type="text" id="colorText" size="10" value="#FFF" disabled>
+<br>
+<br>
+<br>
+<button id="btnSend">Send dots to LED-SIGN</button>
+</div>
+</div>
+</div>
+<div class="Table">
+<div class="Row">
+<div class="Cell">
+<div id="ledMatrix0" class="ledMatrix Table"></div>
+</div>
+<div class="Cell">
+<button id="btnCopy1">&rarr;</button>
+</div>
+<div class="Cell">
+<div id="ledMatrix1" class="ledMatrix Table"></div>
+</div>
+<div class="Cell">
+<button id="btnCopy2">&rarr;</button>
+</div>
+<div class="Cell">
+<div id="ledMatrix2" class="ledMatrix Table"></div>
+</div>
+</div>
+<div class="Row">
+<div class="Cell">
+</div>
+<div class="Cell">
+</div>
+<div class="Cell">
+</div>
+<div class="Cell">
+</div>
+<div class="Cell">
+<button id="btnCopy3">&darr;</button>
+</div>
+</div>
+<div class="Row">
+<div class="Cell">
+<div id="ledMatrix5" class="ledMatrix Table"></div>
+</div>
+<div class="Cell">
+<button id="btnCopy5">&larr;</button>
+</div>
+<div class="Cell">
+<div id="ledMatrix4" class="ledMatrix Table"></div>
+</div>
+<div class="Cell">
+<button id="btnCopy4">&larr;</button>
+</div>
+<div class="Cell">
+<div id="ledMatrix3" class="ledMatrix Table"></div>
+</div>
+</div>
+</div>
+<div id="dataOutput"></div>
+<div id="txtResponse"></div>
+<script>
+var w = 5;
+var h = 5;
+var frames = 6;
+var colorMin = 3;
+var colorMax = 9;
+var xhr;
+
+function getRGB(e) {
+   return window.getComputedStyle(e).backgroundColor.match(/\d+/g).map(function(a){ return Math.round(parseInt(a, 10) / 16.5); });
+}
+
+function getColor(e) {
+   var ct = document.getElementById("colorText");
+   var rgb = getRGB(e);
+   ct.value = "#" + rgb[0].toString(16) + rgb[1].toString(16) + rgb[2].toString(16);
+   ct.style.backgroundColor = ct.value;
+}
+
+function setColor(e) {
+   var ct = document.getElementById("colorText");
+   e.style.backgroundColor = ct.value;
+}
+
+function copyDot(fromBlock, toBlock) {
+  for (var i = 0; i < (w * h); i++) {
+    fromDot = document.getElementById("dot_" + (i + (fromBlock * w * h)));
+    toDot = document.getElementById("dot_" + (i + (toBlock * w * h)));
+    toDot.style.backgroundColor = fromDot.style.backgroundColor;
+  }
+}
+
+function sendData() {
+   var o = document.getElementById("dataOutput");
+   var text = "";
+   for (var i = 0; i < (frames * h * w); i++) {
+      var d = document.getElementById("dot_" + i);
+      var rgb = getRGB(d);
+      text += String.fromCharCode(rgb[1] - colorMin);
+      text += String.fromCharCode(rgb[0] - colorMin);
+      text += String.fromCharCode(rgb[2] - colorMin);
+   }
+   text = "action=save&filename=led-sign.dat&data=" + encodeURIComponent(text);
+
+   o.innerHTML = text;
+   if (!xhr) xhr = new XMLHttpRequest();
+   xhr.open("POST", "file-api.lc", true);
+   xhr.onreadystatechange=function() {
+      if ((xhr.readyState === 4) && (xhr.status == 200)) {
+          var r = document.getElementById("txtResponse");
+          r.innerHTML = xhr.responseText;
+          if (!xhr) xhr = new XMLHttpRequest();
+          xhr.open("POST", "led-sign.lc", true);
+          xhr.onreadystatechange = function() {
+            if ((xhr.readyState === 4) && (xhr.status == 200)) {
+              var r = document.getElementById("txtResponse");
+              r.innerHTML = xhr.responseText;
+            }
+          };
+          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          xhr.send();
+      }
+   }
+   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+   xhr.send(text);
+}
+
+var cp = document.getElementById("colorPicker");
+var colorHtml = "";
+var i = 0;
+for (var r = colorMin; r <= colorMax; r += ((colorMax - colorMin) / 2)) {
+   for (var g = colorMin; g <= colorMax; g += ((colorMax - colorMin) / 2)) {
+      for (var b = colorMin; b <= colorMax; b += ((colorMax - colorMin) / 2)) {
+         if ((i % 9) == 0) colorHtml += '<div class="Row">';
+         colorHtml += '<div class="Cell"><div class="Color" id="color' + i + '" style="background:#' + r.toString(16) + g.toString(16) + b.toString(16) + ';"></div></div>';
+         if ((i % 9) == 8) colorHtml += '</div>';
+         i++;
+      }
+   }
+}
+cp.innerHTML = colorHtml;
+for (var j = 0; j < i; j++) {
+   var c = document.getElementById("color" + j);
+   c.addEventListener("click", function(e) {
+      getColor(e.target||e.srcElement);
+   });
+}
+
+var reverse = false;
+for (var i = 0; i < frames; i++) {
+  var lm = document.getElementById("ledMatrix" + i);
+  var dotHtml = "";
+  for (var j = 0; j < h; j++) {
+    for (var k = 0; k < w; k++) {
+      if (k == 0) {
+        dotHtml += '<div calss="Row">';
+        reverse = ((j % 2) == 1)?true:false;
+      }
+      dotHtml += '<div class="Cell"><div class="Circle" id="dot_' + ((reverse?(w-k-1):k) + (j * w) + (i * h * w)) + '"></div></div>';
+      if (k == (w - 1)) dotHtml += '</div>';
+    }
+  }
+  lm.innerHTML = dotHtml;
+}
+for (var i = 0; i < (frames * h * w); i++) {
+   var d = document.getElementById("dot_" + i);
+   d.addEventListener("click", function(e) {
+      setColor(e.target||e.srcElement);
+   });
+}
+
+document.getElementById("btnSend").addEventListener("click", sendData);
+document.getElementById("btnCopy1").addEventListener("click", function() {copyDot(0, 1);});
+document.getElementById("btnCopy2").addEventListener("click", function() {copyDot(1, 2);});
+document.getElementById("btnCopy3").addEventListener("click", function() {copyDot(2, 3);});
+document.getElementById("btnCopy4").addEventListener("click", function() {copyDot(3, 4);});
+document.getElementById("btnCopy5").addEventListener("click", function() {copyDot(4, 5);});
+</script>
+</body>
+</html>
